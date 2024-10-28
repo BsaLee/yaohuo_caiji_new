@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论坛帖子列表</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(to right, #e0e0e0 30%, #ffffff 30%, #ffffff 70%, #e0e0e0 70%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px; /* 最大宽度 */
+            margin: 0 30%; /* 默认左右各留白 30% */
+        }
+
+        .notice {
+            background-color: #ffc107;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .post {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff; /* 帖子背景颜色 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .title:hover {
+            text-decoration: underline;
+        }
+
+        .info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 媒体查询：屏幕宽度小于或等于 768px 时 */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0; /* 手机屏幕不留白 */
+            }
+
+            body {
+                background: linear-gradient(to right, #ffffff 0%, #ffffff 100%); /* 手机背景为纯白 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="notice">采集妖火论坛新帖列表</div>
+        <div id="postsContainer"></div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/shouye.php', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.status === "success") {
+                        displayPosts(response.data);
+                    } else {
+                        console.error('Failed to load posts:', response);
+                    }
+                }
+            };
+            xhr.send();
+        };
+
+        function displayPosts(posts) {
+            var container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+            posts.forEach(function(post) {
+                var postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                var title = document.createElement('a');
+                title.className = 'title';
+                title.textContent = post.title;
+                title.href = '/neirong.html?id=' + post.id;
+                title.target = '_self'; 
+
+                var info = document.createElement('div');
+                info.className = 'info';
+                // 显示处理状态和采集时间
+                var status = post.isok ? '已采集' : '未采集';
+                info.innerHTML = '作者: ' + post.author + 
+                                 ' | 阅读: ' + post.replies + 
+                                 ' | 回复: ' + post.views + 
+                                 ' | 状态: ' + status + 
+                                 '<br>发布: ' + post.time + 
+                                 ' | 采集: ' + post.created_at;
+
+                postDiv.appendChild(title);
+                postDiv.appendChild(info);
+                container.appendChild(postDiv);
+            });
+        }
+    </script>
+</body>
+</html>

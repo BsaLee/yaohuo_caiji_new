@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帖子内容</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(to right, #e0e0e0 30%, #ffffff 30%, #ffffff 70%, #e0e0e0 70%);
+        }
+
+        .post-container {
+            width: 100%;
+            max-width: 800px; /* 最大宽度 */
+            margin: 0 30%; /* 默认左右各留白 30% */
+        }
+
+        .post {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px 0; /* 上下留一点间距 */
+            background-color: #fff; /* 帖子背景颜色 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #007bff;
+        }
+
+        .info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .content {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .back-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .signature {
+            margin-top: 10px;
+            font-style: italic;
+            color: #888;
+        }
+
+        .attachments {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .attachments a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        /* 媒体查询：屏幕宽度小于或等于 768px 时 */
+        @media (max-width: 768px) {
+            .post-container {
+                margin: 0; /* 手机屏幕不留白 */
+            }
+
+            body {
+                background: linear-gradient(to right, #ffffff 0%, #ffffff 100%); /* 手机背景为纯白 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="post-container" id="postContainer"></div>
+
+    <script>
+        function goBack() {
+            window.history.go(-1);
+        }
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        window.onload = function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var id = urlParams.get('id');
+            if (!id) {
+                alert('缺少参数 id');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/tid.php?link=' + id, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var postData = JSON.parse(xhr.responseText);
+                        if (postData.status === 'success') {
+                            displayPost(postData);
+                        } else {
+                            displayEmptyPost(); // 显示空白帖子
+                        }
+                    } else {
+                        displayEmptyPost(); // 显示空白帖子
+                    }
+                }
+            };
+            xhr.send();
+        };
+
+        function displayPost(postData) {
+            // 更新页面标题为帖子标题
+            document.title = postData.data.title;
+
+            var container = document.getElementById('postContainer');
+            var postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            
+            var titleDiv = document.createElement('div');
+            titleDiv.className = 'title';
+            titleDiv.textContent = postData.data.title;
+
+            var button = document.createElement('button');
+            button.className = 'button';
+            button.textContent = '跳转原帖';
+            button.onclick = function() {
+                window.open('https://www.yaohuo.me/bbs-' + postData.data.link + ".html", '_blank');
+            };
+            titleDiv.appendChild(button);
+
+            var info = document.createElement('div');
+            info.className = 'info';
+            info.innerHTML = '作者: ' + postData.data.author + ' | 等级: ' + postData.data.level + ' | 阅读数: ' + postData.data.views + ' | 回复数: ' + postData.data.replies + ' | 发布时间: ' + postData.data.post_time;
+
+            var content = document.createElement('div');
+            content.className = 'content';
+            content.innerHTML = postData.data.content.replace(/\n/g, '<br>');
+
+            var signature = document.createElement('div');
+            signature.className = 'signature';
+            signature.textContent = '帖子类型: ' + (postData.data.attributes ? postData.data.attributes : '无');
+
+            // 将标题、信息、正文添加到帖子中
+            postDiv.appendChild(titleDiv);
+            postDiv.appendChild(info);
+            postDiv.appendChild(content);
+            postDiv.appendChild(signature);
+
+            // 将附件链接放在帖子正文的最下边
+            if (postData.data.attachments && postData.data.attachments.length > 0) {
+                var attachmentsDiv = document.createElement('div');
+                attachmentsDiv.className = 'attachments';
+                attachmentsDiv.innerHTML = '附件: ';
+                
+                postData.data.attachments.forEach(function(attachment, index) {
+                    var link = document.createElement('a');
+                    link.href = attachment.link; // 使用附件的链接
+                    link.textContent = attachment.name; // 使用附件的名称
+                    link.target = '_blank';
+                    attachmentsDiv.appendChild(link);
+                    if (index < postData.data.attachments.length - 1) {
+                        attachmentsDiv.innerHTML += ', '; // 添加逗号分隔
+                    }
+                });
+
+                postDiv.appendChild(attachmentsDiv); // 在最后添加附件
+            }
+
+            container.appendChild(postDiv);
+
+            // 添加返回按钮
+            var backButtonsDiv = document.createElement('div');
+            backButtonsDiv.className = 'back-buttons';
+            backButtonsDiv.innerHTML = `
+                <button class="button" onclick="goBack()">返回上页</button>
+                <button class="button" onclick="goHome()">返回首页</button>
+            `;
+            container.appendChild(backButtonsDiv);
+        }
+
+        function displayEmptyPost() {
+            var container = document.getElementById('postContainer');
+            var postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            
+            var titleDiv = document.createElement('div');
+            titleDiv.className = 'title';
+            titleDiv.textContent = '帖子内容未采集完成';
+
+            var info = document.createElement('div');
+            info.className = 'info';
+            info.innerHTML = '作者: 路桥 | 等级: 888 | 阅读数: 888 | 回复数: 888 | 发布时间: 很久之前';
+
+            var content = document.createElement('div');
+            content.className = 'content';
+            content.innerHTML = '同学,你来早了,程序正在快马加鞭的采集中,过一会刷新再看看吧!';
+
+            // 将标题、信息、正文添加到帖子中
+            postDiv.appendChild(titleDiv);
+            postDiv.appendChild(info);
+            postDiv.appendChild(content);
+
+            container.appendChild(postDiv);
+
+            // 添加返回按钮
+            var backButtonsDiv = document.createElement('div');
+            backButtonsDiv.className = 'back-buttons';
+            backButtonsDiv.innerHTML = `
+                <button class="button" onclick="goBack()">返回上页</button>
+                <button class="button" onclick="goHome()">返回首页</button>
+            `;
+            container.appendChild(backButtonsDiv);
+        }
+    </script>
+</body>
+</html>
