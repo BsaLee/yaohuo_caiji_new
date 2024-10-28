@@ -1,7 +1,11 @@
 <?php
 // 引入 config.php 读取配置信息
 require 'config.php';
-
+// 检查 URL 中是否包含 key 参数
+if (!isset($_GET['key']) || $_GET['key'] !== KEY) {
+    echo json_encode(['error' => '无效的 key 参数。'], JSON_UNESCAPED_UNICODE);
+    exit; // 如果不匹配，终止执行
+}
 // 从数据库中读取 isok 为空的最小 id 的 link
 $query = "SELECT id, link FROM posts WHERE isok IS NULL ORDER BY id ASC LIMIT 1";
 $result = mysqli_query($connection, $query);
