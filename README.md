@@ -31,3 +31,9 @@
 - 配置信息已在 `config.php` 中详细备注。如有不明之处，请保持默认设置。
 - `sid` 为必填项，缺少此项将无法成功采集数据。
 
+## 演示网站
+- https://yh.di39.com/
+## 我的微信推送订阅
+- https://wxpusher.zjiecode.com/api/message/2g2gLmN9z7FbnHEM296tuF7ZMhF0k4zi
+- https://wxpusher.zjiecode.com/api/qrcode/Wor0vQ5nsGMlrBFGRfc6qDVfWaQV8t3aLJbjyYpOrrsVZN1DoBIW7CQCc4erHHSv.jpg
+- https://wxpusher.zjiecode.com/wxuser/?type=2&id=30818#/follow
