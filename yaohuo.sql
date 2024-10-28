@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： localhost
--- 生成日期： 2024-10-28 22:56:55
+-- 生成日期： 2024-10-29 00:54:39
 -- 服务器版本： 8.0.12
 -- PHP 版本： 7.3.4
 
@@ -21,6 +21,32 @@ SET time_zone = "+00:00";
 --
 -- 数据库： `yaohuo`
 --
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `downloads`
+--
+
+CREATE TABLE `downloads` (
+  `id` int(11) NOT NULL,
+  `siteid` int(11) NOT NULL,
+  `classid` int(11) NOT NULL,
+  `book_id` int(11) NOT NULL,
+  `param_id` int(11) NOT NULL,
+  `RndPath` varchar(255) NOT NULL,
+  `n` text NOT NULL,
+  `response_data` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `IP` text
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `downloads`
+--
+
+INSERT INTO `downloads` (`id`, `siteid`, `classid`, `book_id`, `param_id`, `RndPath`, `n`, `response_data`, `created_at`, `IP`) VALUES
+(3, 1000, 201, 1366020, 863079, 'UploadFiles', '飞鸟听书 2.185会员版v3_鹿蜀.apk', 'https://www.123pan.com/s/hfeA-EcYVh.html', '2024-10-29 00:30:11', '127.0.0.1');
 
 -- --------------------------------------------------------
 
@@ -118,6 +144,13 @@ INSERT INTO `scraped_posts` (`id`, `title`, `post_time`, `content`, `author`, `a
 --
 
 --
+-- 表的索引 `downloads`
+--
+ALTER TABLE `downloads`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `param_id` (`param_id`);
+
+--
 -- 表的索引 `posts`
 --
 ALTER TABLE `posts`
@@ -133,6 +166,12 @@ ALTER TABLE `scraped_posts`
 --
 -- 在导出的表使用AUTO_INCREMENT
 --
+
+--
+-- 使用表AUTO_INCREMENT `downloads`
+--
+ALTER TABLE `downloads`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- 使用表AUTO_INCREMENT `posts`
