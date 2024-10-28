@@ -18,6 +18,7 @@ define('KEY', "ADWHJDGAJ786786");//接口密钥 防止被恶意调用(新帖、�
 define('PUSH', "WxPusher");//官网https://wxpusher.zjiecode.com/admin/main
 define('WxPusher', "AT_1111111111111111");//WxPusher的APP_TOKEN
 define('topicIds', 34731);//https://wxpusher.zjiecode.com/admin/main/topics/list
+define('Download', 10);//每日限制下载次数
 // 配置结束
 $connection = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
