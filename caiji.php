@@ -6,6 +6,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== KEY) {
     echo json_encode(['error' => '无效的 key 参数。'], JSON_UNESCAPED_UNICODE);
     exit; // 如果不匹配，终止执行
 }
+
 // 从数据库中读取 isok 为空的最小 id 的 link
 $query = "SELECT id, link FROM posts WHERE isok IS NULL ORDER BY id ASC LIMIT 1";
 $result = mysqli_query($connection, $query);
@@ -35,6 +36,13 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array("Cookie: $sidCookie")); // 设置请�
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // 禁用 SSL 证书验证
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // 禁用主机验证
 
+// 检查 CAIJI_DEBUG 常量
+if (defined('CAIJI_DEBUG') && CAIJI_DEBUG) {
+    // 打印请求的 URL 和头部信息
+    echo "请求的 URL: $url\n";
+    echo "请求头部: " . print_r(array("Cookie" => $sidCookie), true) . "\n";
+}
+
 // 执行 cURL 请求
 $response = curl_exec($ch);
 
@@ -42,6 +50,11 @@ $response = curl_exec($ch);
 if ($response === false) {
     echo json_encode(["error" => 'cURL Error: ' . curl_error($ch)]);
     exit;
+}
+
+// 如果 CAIJI_DEBUG 为 true，打印响应内容
+if (defined('CAIJI_DEBUG') && CAIJI_DEBUG) {
+    echo "响应内容: " . $response . "\n";
 }
 
 // 关闭 cURL 资源
@@ -59,6 +72,25 @@ $data = [];
 // 提取网页标题
 $titleNodes = $dom->getElementsByTagName('title');
 $title = $titleNodes->length > 0 ? trim($titleNodes->item(0)->textContent) : '';
+
+// 检查网页标题是否包含提示信息
+if (strpos($title, '提示信息') !== false) { // 替换 '提示信息' 为你要检查的具体内容
+    echo json_encode(['code' => 400, 'msg' => 'sid失效or帖子被删除or权限不足']);
+}
+
+// 检查响应内容是否包含"您没有权限操作，或者帖子已删除"
+if (strpos($response, '您没有权限操作，或者帖子已删除') !== false) {
+    // 执行删除操作
+    $deleteSql = "DELETE FROM posts WHERE id = $linkId"; // 使用 $linkId 删除对应记录
+
+    // 执行删除查询
+    if (mysqli_query($connection, $deleteSql)) {
+        echo json_encode(['code' => 200, 'msg' => '记录已删除']);
+    } else {
+        echo json_encode(['code' => 400, 'msg' => '删除失败: ' . mysqli_error($connection)]);
+    }
+    exit; // 退出脚本，避免后续逻辑
+}
 
 // 提取发帖时间
 $xpath = new DOMXPath($dom);
@@ -122,7 +154,7 @@ if (CAIJI_JSON) {
     echo json_encode($data);
 } else {
     // 输出请求成功的 JSON
-    echo json_encode(["code" => 200]);
+    // echo json_encode(["code" => 200]);
 }
 
 // 插入数据到 scraped_posts 表
@@ -130,10 +162,10 @@ $insertQuery = "INSERT INTO scraped_posts (title, post_time, content, author, au
 $stmt = $connection->prepare($insertQuery);
 
 // 检查准备语句是否成功
-//if ($stmt === false) {
-//    echo json_encode(["error" => "准备 SQL 语句失败: " . $connection->error]);
-//    exit;
-//}
+// if ($stmt === false) {
+//     echo json_encode(["error" => "准备 SQL 语句失败: " . $connection->error]);
+//     exit;
+// }
 
 // 绑定参数
 $attachmentsJson = json_encode($attachments, JSON_UNESCAPED_UNICODE);
@@ -183,8 +215,11 @@ if (!$stmt->execute()) {
         // 关闭 cURL 资源
         curl_close($chTuisong);
     }
-    
+
+    echo json_encode(["code" => 200, "msg" => "数据处理成功"]);
 }
 
+// 关闭数据库连接
 $stmt->close();
+$connection->close();
 ?>
