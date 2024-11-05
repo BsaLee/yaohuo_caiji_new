@@ -73,25 +73,17 @@ $data = [];
 $titleNodes = $dom->getElementsByTagName('title');
 $title = $titleNodes->length > 0 ? trim($titleNodes->item(0)->textContent) : '';
 
-// 检查网页标题是否包含提示信息
-if (strpos($title, '提示信息') !== false) { // 替换 '提示信息' 为你要检查的具体内容
-    echo json_encode(['code' => 400, 'msg' => 'sid失效or帖子被删除or权限不足']);
-}
-
 // 检查响应内容是否包含"您没有权限操作，或者帖子已删除"或"正在审核中"
 if (strpos($response, '您没有权限操作，或者帖子已删除') !== false || strpos($response, '正在审核中') !== false) {
-    // 执行删除操作
-    $deleteSql = "DELETE FROM posts WHERE id = $linkId"; // 使用 $linkId 删除对应记录
+    // 构建 URL
+    $url = WEB . '/error.php?id=' . urlencode($linkId) . '&key=' . urlencode(KEY);
 
-    // 执行删除查询
-    if (mysqli_query($connection, $deleteSql)) {
-        echo json_encode(['code' => 200, 'msg' => '记录已删除']);
-    } else {
-        echo json_encode(['code' => 500, 'msg' => '删除失败: ' . mysqli_error($connection)]);
-    }
+    // 执行 GET 请求
+    file_get_contents($url);
+    echo json_encode(["code" => 400, "msg" => "帖子已删除或正在审核中"]);
+
     exit; // 退出脚本，避免后续逻辑
 }
-
 
 // 提取发帖时间
 $xpath = new DOMXPath($dom);
@@ -162,12 +154,6 @@ if (CAIJI_JSON) {
 $insertQuery = "INSERT INTO scraped_posts (title, post_time, content, author, author_id, level, views, attachments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 $stmt = $connection->prepare($insertQuery);
 
-// 检查准备语句是否成功
-// if ($stmt === false) {
-//     echo json_encode(["error" => "准备 SQL 语句失败: " . $connection->error]);
-//     exit;
-// }
-
 // 绑定参数
 $attachmentsJson = json_encode($attachments, JSON_UNESCAPED_UNICODE);
 $stmt->bind_param("ssssisss", $title, $postTime, $content, $author, $authorId, $level, $views, $attachmentsJson);
@@ -198,23 +184,21 @@ if (!$stmt->execute()) {
 
     // 如果 TUISONG 为 true，发送 link 到 tuisong.php
     if (TUISONG) {
-        $tuisongUrl = WEB . '/tuisong.php?link=' . urlencode($link) . '&key=' . urlencode(KEY); // 拼接 URL，使用 urlencode 编码 link 和 KEY
-        //echo $tuisongUrl;
-        // 初始化 cURL
-        $chTuisong = curl_init();
-        curl_setopt($chTuisong, CURLOPT_URL, $tuisongUrl); // 设置请求的 URL
-        curl_setopt($chTuisong, CURLOPT_RETURNTRANSFER, true); // 将响应存储为字符串
-    
-        // 执行 cURL 请求
-        $tuisongResponse = curl_exec($chTuisong);
-    
-        // 检查是否有错误
-        // if ($tuisongResponse === false) {
-        //     echo json_encode(["error" => 'tuisong.php Error: ' . curl_error($chTuisong)]);
-        // }
-    
-        // 关闭 cURL 资源
-        curl_close($chTuisong);
+        if (PUSH === 'WxPusher') {
+            $tuisongUrl = WEB . '/WxPusher.php?link=' . urlencode($link) . '&key=' . urlencode(KEY); 
+            $chTuisong = curl_init();
+            curl_setopt($chTuisong, CURLOPT_URL, $tuisongUrl); // 设置请求的 URL
+            curl_setopt($chTuisong, CURLOPT_RETURNTRANSFER, true); // 将响应存储为字符串
+            $tuisongResponse = curl_exec($chTuisong);
+            curl_close($chTuisong);
+        }
+        if (PUSH === 'WxWorkApp') {
+            $tuisongUrl = WEB . '/WxWorkApp.php?link=' . urlencode($link) . '&key=' . urlencode(KEY); 
+            $chTuisong = curl_init();
+            curl_setopt($chTuisong, CURLOPT_URL, $tuisongUrl); // 设置请求的 URL
+            curl_setopt($chTuisong, CURLOPT_RETURNTRANSFER, true); // 将响应存储为字符串
+            $tuisongResponse = curl_exec($chTuisong);
+        }
     }
 
     echo json_encode(["code" => 200, "msg" => "数据处理成功"]);
