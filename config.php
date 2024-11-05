@@ -15,7 +15,7 @@ define('CAIJI_JSON', False); // 帖子内容采集接口是否输出帖子json T
 define('TUISONG', true);// 是否推送
 define('SHULIANG', 50); //首页展示数据数量
 define('KEY', "ADWHJDGAJ786786");//接口密钥 防止被恶意调用(新帖、内容、推送这三个接口带)
-define('PUSH', "WxPusher");//官网https://wxpusher.zjiecode.com/admin/main
+define('PUSH', "WxWorkApp");//WxPusher或者WxWorkApp
 define('WxPusher', "AT_1111111111111111");//WxPusher的APP_TOKEN
 define('topicIds', 34731);//https://wxpusher.zjiecode.com/admin/main/topics/list
 define('Download', 10);//每日限制下载次数
