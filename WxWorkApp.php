@@ -77,7 +77,7 @@ if (isset($_GET['link'])) {
             ];
 
             // 检查 PUSH 常量
-            if (defined('PUSH') && PUSH === 'WxWorkApp') {
+            if (defined('PUSH2') && PUSH2 === 'WxWorkApp') {
                 $accessToken = getAccessToken(CORP_ID, SECRET); // 获取 access_token
                 if ($accessToken) {
                     $level = htmlspecialchars($scrapedData['level'], ENT_QUOTES, 'UTF-8');
