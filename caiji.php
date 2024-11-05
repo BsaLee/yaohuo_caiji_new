@@ -78,8 +78,8 @@ if (strpos($title, '提示信息') !== false) { // 替换 '提示信息' 为你�
     echo json_encode(['code' => 400, 'msg' => 'sid失效or帖子被删除or权限不足']);
 }
 
-// 检查响应内容是否包含"您没有权限操作，或者帖子已删除"
-if (strpos($response, '您没有权限操作，或者帖子已删除') !== false) {
+// 检查响应内容是否包含"您没有权限操作，或者帖子已删除"或"正在审核中"
+if (strpos($response, '您没有权限操作，或者帖子已删除') !== false || strpos($response, '正在审核中') !== false) {
     // 执行删除操作
     $deleteSql = "DELETE FROM posts WHERE id = $linkId"; // 使用 $linkId 删除对应记录
 
@@ -87,10 +87,11 @@ if (strpos($response, '您没有权限操作，或者帖子已删除') !== false
     if (mysqli_query($connection, $deleteSql)) {
         echo json_encode(['code' => 200, 'msg' => '记录已删除']);
     } else {
-        echo json_encode(['code' => 400, 'msg' => '删除失败: ' . mysqli_error($connection)]);
+        echo json_encode(['code' => 500, 'msg' => '删除失败: ' . mysqli_error($connection)]);
     }
     exit; // 退出脚本，避免后续逻辑
 }
+
 
 // 提取发帖时间
 $xpath = new DOMXPath($dom);
