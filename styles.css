@@ -1,0 +1,132 @@
+/* 样式与之前相同 */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(to right, #e0e0e0 30%, #ffffff 30%, #ffffff 70%, #e0e0e0 70%);
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 30%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.notice {
+    background-color: #ffc107;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.post {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.title:hover {
+    text-decoration: underline;
+}
+
+.info {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 搜索框及按钮 */
+.search-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#searchInput {
+    padding: 8px;
+    font-size: 16px;
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#searchButton {
+    padding: 8px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#searchButton:hover {
+    background-color: #0056b3;
+}
+
+/* 分页按钮样式 */
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 媒体查询 */
+@media (max-width: 768px) {
+    .container {
+        margin: 0 10%;
+    }
+
+    body {
+        background: linear-gradient(to right, #ffffff 0%, #ffffff 100%);
+    }
+
+    .search-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    #searchButton {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .post {
+        padding: 10px;
+    }
+}
