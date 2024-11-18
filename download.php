@@ -1,6 +1,7 @@
 <?php
 require 'config.php'; // 包含数据库连接和常量定义
 
+
 // 接收 POST 请求的 URL 参数
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['url'])) {
     $url = $_POST['url'];
@@ -100,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['url'])) {
     $targetUrl = str_replace('/bbs/link.html?target=', '', $fullUrl);
 
     // 写入数据库
+    $conn->set_charset("utf8mb4");
     $stmt = $conn->prepare("INSERT INTO downloads (siteid, classid, book_id, param_id, RndPath, n, response_data, created_at, IP) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?)");
     $ipAddress = $_SERVER['REMOTE_ADDR']; // 获取用户 IP
     $stmt->bind_param("iiisssss", $queryParams['siteid'], $queryParams['classid'], $queryParams['book_id'], $paramId, $queryParams['RndPath'], $queryParams['n'], $targetUrl, $ipAddress);
