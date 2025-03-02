@@ -84,6 +84,16 @@ if (strpos($response, '您没有权限操作，或者帖子已删除') !== false
 
     exit; // 退出脚本，避免后续逻辑
 }
+if (strpos($response, '找不到') !== false || strpos($response, '正在审核中') !== false) {
+    // 构建 URL
+    $url = WEB . '/error.php?id=' . urlencode($linkId) . '&key=' . urlencode(KEY);
+
+    // 执行 GET 请求
+    file_get_contents($url);
+    echo json_encode(["code" => 400, "msg" => "帖子已删除或正在审核中"]);
+
+    exit; // 退出脚本，避免后续逻辑
+}
 
 // 提取发帖时间
 $xpath = new DOMXPath($dom);
@@ -192,7 +202,8 @@ if (!$stmt->execute()) {
             $tuisongResponse = curl_exec($chTuisong);
             curl_close($chTuisong);
         }
-        if (PUSH === 'WxWorkApp') {
+        if (PUSH2 === 'WxWorkApp') {
+            echo json_encode(["code" => 200, "msg" => "数据处理成功"]);
             $tuisongUrl = WEB . '/WxWorkApp.php?link=' . urlencode($link) . '&key=' . urlencode(KEY); 
             $chTuisong = curl_init();
             curl_setopt($chTuisong, CURLOPT_URL, $tuisongUrl); // 设置请求的 URL
