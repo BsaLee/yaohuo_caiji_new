@@ -10,7 +10,18 @@
 - **Nginx**: 1.15 或更高版本
 - **MySQL**: 8.0 或更高版本
 - **PHP**: 8.0 或更高版本
-
+## NGINX配置
+```
+    # 新增location块来限制特定目录的访问
+    location /Download/ {
+        autoindex off;  # 禁止目录列表
+        if ($request_filename ~* \.(txt|pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar)$) {
+            add_header Content-Disposition "attachment";
+            add_header Content-Type application/octet-stream;
+        }
+        try_files $uri $uri/ =404;  # 如果文件不存在，返回404
+    }
+```
 配置信息请查看 `config.php` 文件。
 
 ## 接口说明
