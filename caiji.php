@@ -1,6 +1,7 @@
 <?php
 // 引入 config.php 读取配置信息
 require 'config.php';
+header('Content-Type: application/json');
 // 检查 URL 中是否包含 key 参数
 if (!isset($_GET['key']) || $_GET['key'] !== KEY) {
     echo json_encode(['error' => '无效的 key 参数。'], JSON_UNESCAPED_UNICODE);
@@ -112,8 +113,14 @@ if ($contentNodes->length > 0) {
 // 提取楼主昵称和用户ID
 $authorNodes = $xpath->query("//span[contains(@class, 'louzhunicheng')]/a");
 $author = $authorNodes->length > 0 ? trim($authorNodes->item(0)->textContent) : '';
-preg_match('/touserid=(\d+)/', $authorNodes->item(0)->getAttribute('href'), $matches);
-$authorId = isset($matches[1]) ? $matches[1] : '未知';
+
+$authorId = '未知';
+if ($authorNodes->length > 0) {
+    $authorLink = $authorNodes->item(0)->getAttribute('href');
+    if (preg_match('/touserid=(\d+)/', $authorLink, $matches)) {
+        $authorId = $matches[1];
+    }
+}
 
 // 提取楼主等级
 $levelNodes = $xpath->query("//span[contains(@class, 'dengji')]");
