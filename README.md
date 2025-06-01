@@ -52,3 +52,4 @@
 - https://wxpusher.zjiecode.com/api/message/2g2gLmN9z7FbnHEM296tuF7ZMhF0k4zi
 - https://wxpusher.zjiecode.com/api/qrcode/Wor0vQ5nsGMlrBFGRfc6qDVfWaQV8t3aLJbjyYpOrrsVZN1DoBIW7CQCc4erHHSv.jpg
 - https://wxpusher.zjiecode.com/wxuser/?type=2&id=30818#/follow
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
